@@ -11,6 +11,8 @@ func TestConfigure(t *testing.T){
 			Ttl: 20,
 			Port: "8000",
 		},
+	)
+	Prime(
 		func(uid string)bool{return true},
 		func(c *Client)bool{
 			if c.Uid == "111111111111" {
@@ -18,6 +20,7 @@ func TestConfigure(t *testing.T){
 			}
 			return true
 		},
+		func(uid string){return},
 	)
 	if std.conf.Ttl != 20 {
 		t.Error("expected Ttl = 20, got ", std.conf.Ttl)
@@ -32,6 +35,7 @@ func TestConfigure(t *testing.T){
 		t.Error("expected handlers function, got none.")
 	}
 }
+
 // function used for testing purpose, see config test above.
 func t_ack(c *Client, param string){}
 
