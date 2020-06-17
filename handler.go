@@ -23,7 +23,7 @@ func connHandler(conn net.Conn) {
 	client, _ := GetClient(uid)
 	std.handlers(client)
 	clientStat := &std.clients[uid].active
-	
+
 	defer func(clientStat *bool, uid string) {
 		*clientStat = false
 		std.onDisconnect(uid)
@@ -32,7 +32,7 @@ func connHandler(conn net.Conn) {
 
 	msgQ := std.clients[uid].msgQ
 	msgQ = msgQ
-	
+
 	outbox := make(chan Cmd, 1)
 	stopSend := make(chan bool, 1)
 	sendStopped := make(chan bool, 1)

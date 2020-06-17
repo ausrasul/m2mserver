@@ -1,6 +1,6 @@
 package m2mserver
 import (
-    "net"
+	"net"
 	"errors"
 	"log"
 	"sync"
@@ -8,8 +8,8 @@ import (
 )
 
 type M2mConf struct {
-	Ttl	int
-	Port		string
+	Ttl   int
+	Port  string
 }
 
 type M2m struct {
@@ -119,28 +119,28 @@ func (c *Client) HasHandler(cmdName string) bool{
 }
 
 func Listen(){
-	
-    // Listen for incoming connections.
+
+	// Listen for incoming connections.
 	for {
 		l, err := net.Listen("tcp", "0.0.0.0:" + std.conf.Port)
-        if err != nil {
+		if err != nil {
 			log.Print("Error listening:", err.Error())
-            continue
-        }
-        // Close the listener when the application closes.
-        defer l.Close()
-    
-        for {
-            // Listen for an incoming connection.
-            conn, err := l.Accept()
-            if err != nil {
-                continue
-            } else {
-                // Handle connections in a new goroutine.
+			continue
+		}
+		// Close the listener when the application closes.
+		defer l.Close()
+
+		for {
+			// Listen for an incoming connection.
+			conn, err := l.Accept()
+			if err != nil {
+				continue
+			} else {
+				// Handle connections in a new goroutine.
 				go connHandler(conn)
-            }
-        }
-    }
+			}
+		}
+	}
 }
 
 func GetClient(esn string) (*Client, error){
