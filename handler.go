@@ -79,7 +79,11 @@ func connHandler(conn net.Conn) {
 			} else {
 				callback, ok := client.handler[cmd.Name]
 				log.Print(ok)
-				callback(client, cmd.Param)
+				if !ok {
+					log.Print("No handler for command ", cmd.Name)
+				} else {
+					callback(client, cmd.Param)
+				}
 			}
 		case msg := <-msgQ:
 			log.Print("Push notification: ", msg.Name)
