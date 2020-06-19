@@ -5,6 +5,8 @@ A Go Object Request Broker
 This is a server client library that lets you send commands in json format to execute remote code
  to multiple clients/workers in the form of broadcast, multicast, individual.
 
+You can find the server part here [https://github.com/ausrasul/m2mclient](https://github.com/ausrasul/m2msclient)
+
 ## When to use Go ORB
 - To run functions or OS commands on multiple clients and receive responses.
 - To run the above as a scheduled task (like cron job)
