@@ -18,6 +18,9 @@ This is a server client library that lets you send commands in json format to ex
 - Command execution is user implemented.
 
 ## Work mechanism:
+
+![alt text](https://raw.githubusercontent.com/ausrasul/m2mserver/master/diagram.png)
+
 The server starts at a given port, and listen to connections.
 When a client tries to connect, it is authenticated.
 The client or the server can initiate communication (defined by the user)
