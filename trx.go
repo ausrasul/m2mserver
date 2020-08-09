@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"strconv"
+	"io"
 )
 
 func sender(conn net.Conn, outbox <-chan Cmd, stopSend <-chan bool, sendStopped chan<- bool){
