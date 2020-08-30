@@ -76,7 +76,7 @@ func receiver(conn net.Conn, inbox chan<- Cmd, stopRcv <-chan bool, rcvStopped c
 		default:
 		}
 
-		conn.SetDeadline(time.Now().Add(1e9))
+		conn.SetReadDeadline(time.Now().Add(time.Second * 1))
 		// read a chunk and extract following data size to allow us to reassemble the frames.
 		dataSizeByte, err := r.ReadBytes('\n')
 		if err != nil {
@@ -85,8 +85,8 @@ func receiver(conn net.Conn, inbox chan<- Cmd, stopRcv <-chan bool, rcvStopped c
 				continue
 			}
 			log.Print("Error reading:", err.Error())
-			return
 			rcvStopped <- true
+			return
 		}
 		dataSizeByte = dataSizeByte[:len(dataSizeByte)-1] // strip the last byte \n
 		dataSize, err := strconv.Atoi(string(dataSizeByte))
