@@ -16,7 +16,7 @@ func connHandler(conn net.Conn) {
 	if err != nil {
 		return
 	}
-	if !std.authenticate(uid){
+	if !std.authenticate(uid) {
 		return
 	}
 	std.clients[uid] = newClient(uid)
@@ -31,7 +31,6 @@ func connHandler(conn net.Conn) {
 	}(clientStat, uid)
 
 	msgQ := std.clients[uid].msgQ
-	msgQ = msgQ
 
 	outbox := make(chan Cmd, 1)
 	stopSend := make(chan bool, 1)
