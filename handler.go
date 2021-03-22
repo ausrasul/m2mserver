@@ -8,6 +8,10 @@ import (
 
 // Handles incoming requests.
 func connHandler(conn net.Conn) {
+	/*
+		must receive heartbeat from client within Ttl
+		So this ttl must be greater than client's ttl.
+	*/
 	connTimeout := time.Duration(std.conf.Ttl)
 	defer conn.Close()
 
