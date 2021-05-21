@@ -1,17 +1,29 @@
 package m2mserver
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestConfigure(t *testing.T) {
-	if std.initialized {
-		t.Error("Expected initialized false, got true")
-	}
+	assert.False(t, std.initialized, "Initialized is false in the beginning")
+	assert.NotEqual(t, std.conf.Ttl, 20, "TTL is set")
+	assert.NotEqual(t, std.conf.Port, "8000", "Port is set")
 	Configure(
 		M2mConf{
 			Ttl:  20,
 			Port: "8000",
 		},
 	)
+	assert.True(t, std.initialized, "Initialized true after configure")
+	assert.Equal(t, 20, std.conf.Ttl, "TTL is set")
+	assert.Equal(t, std.conf.Port, "8000", "Port is set")
+}
+
+func TestPrime(t *testing.T) {
+	assert.Nil(t, std.authenticate, "Doesn't have authentication function")
+	assert.Nil(t, std.handlers, "Has handler function")
 	Prime(
 		func(uid string) bool { return true },
 		func(c *Client) bool {
@@ -22,48 +34,33 @@ func TestConfigure(t *testing.T) {
 		},
 		func(uid string) { return },
 	)
-	if std.conf.Ttl != 20 {
-		t.Error("expected Ttl = 20, got ", std.conf.Ttl)
-	}
-	if std.conf.Port != "8000" {
-		t.Error("expected Port = 8000, got ", std.conf.Port)
-	}
-	if std.authenticate == nil {
-		t.Error("expected authentication function, got none.")
-	}
-	if std.handlers == nil {
-		t.Error("expected handlers function, got none.")
-	}
+	assert.NotNil(t, std.authenticate, "Has authentication function")
+	assert.NotNil(t, std.handlers, "Has handler function")
 }
 
-// function used for testing purpose, see config test above.
+// function used for testing, see config test above.
 func t_ack(c *Client, param string) {}
 
 func TestNewClient(t *testing.T) {
 	c := newClient("111111111111")
-	if c.Uid != "111111111111" {
-		t.Error("failed to initialized a client, expected uid 111111111111, got ", c.Uid)
-	}
+	assert.Equal(t, c.Uid, "111111111111", "failed to initialized a client")
 }
 
 func TestSendCmd(t *testing.T) {
 	c := newClient("111111111111")
-	c.SendCmd(Cmd{Name: "test", Param: "123"})
+	cmd := Cmd{Name: "test", Param: "123"}
+	c.SendCmd(cmd)
 	select {
 	case m := <-c.msgQ:
-		if m.Name != "test" || m.Param != "123" {
-			t.Error("expected msg name test, got ", m.Name, " and msg param 123, got ", m.Param)
-		}
+		assert.True(t, m.Name == cmd.Name && m.Param == cmd.Param, "Unexpected command sent")
 	default:
-		t.Error("message failed to send, msgQ is empty")
+		assert.True(t, false, "message failed to send, msgQ is empty")
 	}
 }
 
 func TestIsActive(t *testing.T) {
 	c := newClient("111111111111")
-	if !c.IsActive() {
-		t.Error("expecting client active true, got false")
-	}
+	assert.True(t, c.IsActive(), "Client is active")
 }
 
 func TestAddHandler(t *testing.T) {
@@ -71,25 +68,44 @@ func TestAddHandler(t *testing.T) {
 	std.clients["111111111111"] = c
 	std.handlers(c)
 	_, ok := c.handler["test_ack"]
-	if !ok {
-		t.Error("expected handler test_ack, got none.")
-	}
+	assert.True(t, ok, "handler equals test_ack")
 }
 
 func TestHasHandler(t *testing.T) {
 	c := newClient("111111111111")
 	std.clients["111111111111"] = c
 	std.handlers(c)
-	if !c.HasHandler("test_ack") {
-		t.Error("expected hasHandler to return true, got false.")
-	}
+	assert.True(t, c.HasHandler("test_ack"), "handler returns true")
 }
 
 func TestGetClient(t *testing.T) {
 	c := newClient("111111111111")
 	std.clients["111111111111"] = c
 	c, err := GetClient("111111111111")
-	if err != nil || c.Uid != "111111111111" {
-		t.Error("expected to get client 1111.., got ", c.Uid, err)
-	}
+	assert.Nil(t, err, "No errors")
+	assert.Equal(t, "111111111111", c.Uid, "Uid is correct")
 }
+
+func TestListens(t *testing.T) {
+	// mock listner
+}
+
+/*what we should be testing is:
+it configures
+it primes
+it accepts connections
+it authenticate connections
+it keeps heart beat
+it sends commands of any size to buffer
+it handles received commands of any size
+*/
+/*
+how the flow of information should be?
+configure set vars
+set listeners, set vars
+accept connections
+authenticate, this is too complex. should be simpler, just call authenticate.
+heartbeat, send and receive
+receive commands,
+send commands.
+*/

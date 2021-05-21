@@ -3,7 +3,6 @@ package m2mserver
 import (
 	"errors"
 	"log"
-	"net"
 	"sync"
 	"time"
 )
@@ -31,6 +30,8 @@ var std = &M2m{
 	clients: make(map[string]*Client),
 }
 
+var net_ = &net{}
+
 func (m *M2m) Prime(auth func(string) bool, handlers func(*Client) bool, onDisconnect func(string)) {
 	if auth != nil {
 		m.authenticate = auth
@@ -54,7 +55,6 @@ func (m *M2m) Configure(cnf M2mConf) {
 }
 
 func Configure(cnf M2mConf) {
-	log.Print("==================================")
 	std.Configure(cnf)
 }
 
@@ -124,7 +124,7 @@ func Listen() {
 
 	// Listen for incoming connections.
 	for {
-		l, err := net.Listen("tcp", "0.0.0.0:"+std.conf.Port)
+		l, err := net_.Listen("tcp", "0.0.0.0:"+std.conf.Port)
 		if err != nil {
 			log.Print("Error listening:", err.Error())
 			continue
